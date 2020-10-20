@@ -17,8 +17,9 @@ AWS_ECR_REPO="575790519909.dkr.ecr.${AWS_REGION}.amazonaws.com"
 DOCKER_AWS_IMAGE="${AWS_ECR_REPO}/xai"
 DOCKER_TAG=$(date +%m%d%Y).$BUILD_NUMBER
 
-# Tag HEAD in Git repository.
+# Tag HEAD in Git repository. Overwrite if exists. Push tag to remote.
 git tag -f $DOCKER_TAG
+git push origin $DOCKER_TAG
 echo "Tagged repository head with: $DOCKER_TAG"
 
 # rebuild stack up to pytorch-notebook
