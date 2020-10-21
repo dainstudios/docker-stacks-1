@@ -25,7 +25,6 @@ RUN conda config --show channels && \
     conda config --system --set channel_priority flexible && \
     conda install -q -y \
     'conda-forge::blas=*=mkl' \
-    'tensorboard=2.*' \
     'pytorch=1.6*' \
     'torchvision=0.7*' \
     'ignite=0.4*' \
@@ -36,8 +35,22 @@ RUN conda config --show channels && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
+RUN conda config --system --set channel_priority flexible && \
+    conda install -q -y \
+    'tensorboard=2.*' \
+    'yarl>=1.0,<1.6*' \
+    'fire' \
+    'gdown' \
+    'nibabel' \
+    'pillow' \
+    && \
+    conda config --system --set channel_priority strict && \
+    conda clean --all -f -y && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
 # Install MONAI milestone edition with some extras
-RUN pip install -q --no-cache-dir 'monai[gdown,nibabel,pillow]'
+RUN pip install -q --no-cache-dir 'monai'
 
 # Install and build MONAI from master branch, latest development version
 #RUN pip install -q --no-cache-dir git+https://github.com/Project-MONAI/MONAI#egg=MONAI
