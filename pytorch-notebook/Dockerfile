@@ -43,7 +43,15 @@ RUN conda config --system --set channel_priority flexible && \
     'gdown' \
     'nibabel' \
     'pillow' \
+    'pytorch::captum=0.2*' \
+    'flask' \
+    'nodejs>=8.*' \
+    'yarn>=1.5*' \
     && \
+    jupyter nbextension install --py --symlink --sys-prefix captum.insights.widget && \
+    jupyter nbextension enable captum.insights.widget --py --sys-prefix && \
+    rm -rf "/home/${NB_USER}/.cache/yarn" && \
+    rm -rf "/home/${NB_USER}/.node-gyp" && \
     conda config --system --set channel_priority strict && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
