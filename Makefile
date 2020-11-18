@@ -20,10 +20,6 @@ ALL_STACKS:=base-notebook \
 	datascience-notebook \
 	pyspark-notebook \
 	all-spark-notebook
-PYTORCH_STACKS:=base-notebook \
-	minimal-notebook \
-	scipy-notebook \
-	pytorch-notebook
 endif
 
 ALL_IMAGES:=$(ALL_STACKS)
@@ -59,8 +55,6 @@ build/%: ## build the latest image for a stack
 build-all: $(foreach I,$(ALL_IMAGES),arch_patch/$(I) build/$(I) ) ## build all stacks
 build-test-all: $(foreach I,$(ALL_IMAGES),arch_patch/$(I) build/$(I) test/$(I) ) ## build and test all stacks
 
-build-pytorch: $(foreach I,$(PYTORCH_STACKS),arch_patch/$(I) build/$(I) ) ## build stacks up to pytorch
-
 
 check-outdated/%: ## check the outdated conda packages in a stack and produce a report (experimental)
 	@TEST_IMAGE="$(OWNER)/$(notdir $@)" pytest test/test_outdated.py
@@ -76,7 +70,7 @@ cont-rm-all: ## remove all containers
 	-docker rm --force $(shell docker ps -a -q) 2> /dev/null
 
 dev/%: ARGS?=
-dev/%: DARGS?=
+dev/%: DARGS?=	
 dev/%: PORT?=8888
 dev/%: ## run a foreground container for a stack
 	docker run -it --rm -p $(PORT):8888 $(DARGS) $(OWNER)/$(notdir $@) $(ARGS)
