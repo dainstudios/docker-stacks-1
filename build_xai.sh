@@ -23,7 +23,7 @@ git push origin $DOCKER_TAG
 echo "Tagged repository head with: $DOCKER_TAG"
 
 # rebuild stack up to pytorch-notebook
-make -j build-pytorch | tee pytorch-notebook.log
+make -j build/xai-notebook | tee pytorch-notebook.log
 
 # login to DAIN AWS ECR repo
 aws --profile $AWS_PROFILE ecr get-login-password --region $AWS_REGION | \
