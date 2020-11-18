@@ -23,12 +23,12 @@ git push origin $DOCKER_TAG
 echo "Tagged repository head with: $DOCKER_TAG"
 
 # rebuild stack up to pytorch-notebook
-make -j build/xai-notebook | tee pytorch-notebook.log
+make -j build/xai-notebook | tee xai-notebook.log
 
 # login to DAIN AWS ECR repo
 aws --profile $AWS_PROFILE ecr get-login-password --region $AWS_REGION | \
 docker login --username AWS --password-stdin $AWS_ECR_REPO
 
 # tag built image and push it to repo
-docker tag dain/pytorch-notebook:latest $DOCKER_AWS_IMAGE:$DOCKER_TAG
+docker tag dain/xai-notebook:latest $DOCKER_AWS_IMAGE:$DOCKER_TAG
 docker push $DOCKER_AWS_IMAGE:$DOCKER_TAG
