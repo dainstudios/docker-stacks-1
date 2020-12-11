@@ -8,16 +8,15 @@
 # Distributed under the terms of the Modified BSD License.
 #
 ARG BASE_CONTAINER=dain/pytorch-notebook
-ARG GIT_USER=ahtonen
+ARG GIT_USER=pytorch
 ARG GIT_REPO=captum
-ARG GIT_BRANCH=dev
+ARG GIT_BRANCH=master
 ARG WHEEL="captum-0.4.0-py3-none-any.whl"
 
 FROM $BASE_CONTAINER AS builder
 ARG GIT_USER
 ARG GIT_REPO
 ARG GIT_BRANCH
-ARG GIT_HASH="2580702cc1432dae394bedccd4ed2008efcfc697"
 ARG WHEEL
 
 USER root
@@ -30,7 +29,6 @@ RUN conda install -q -y \
 # Checkout custom Captum code
 RUN git clone git://github.com/$GIT_USER/$GIT_REPO /src/$GIT_REPO
 WORKDIR /src/$GIT_REPO
-RUN git checkout $GIT_HASH
 # Build Insights
 RUN BUILD_INSIGHTS=1 python setup.py develop
 # Build Captum wheel
@@ -58,13 +56,15 @@ RUN conda config --system --set channel_priority flexible && \
     'gdown' \
     'nibabel' \
     'pillow' \
+    'black' \
+    'pylint' \
     'flask' && \
     conda config --system --set channel_priority strict && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
-# Install Captum
+# Install Captum wheel made from master branch, latest development version
 RUN pip install -q --no-cache-dir "/tmp/${WHEEL}" && \
     jupyter nbextension install --py --symlink --sys-prefix captum.insights.attr_vis.widget && \
     jupyter nbextension enable captum.insights.attr_vis.widget --py --sys-prefix && \
@@ -74,6 +74,10 @@ RUN pip install -q --no-cache-dir "/tmp/${WHEEL}" && \
 
 # Install MONAI milestone edition with some extras
 RUN pip install -q --no-cache-dir 'monai' && \
+    fix-permissions /home/$NB_USER
+
+# Install Streamlit
+RUN pip install -q --no-cache-dir 'streamlit' && \
     fix-permissions /home/$NB_USER
 
 # Install and build MONAI from master branch, latest development version
