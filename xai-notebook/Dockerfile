@@ -40,8 +40,16 @@ FROM $BASE_CONTAINER
 ARG GIT_REPO
 ARG WHEEL
 
-USER $NB_UID
+# Install ssh-client
+USER root
+RUN apt-get update && \
+    apt-get install -yq openssh-client && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Copy some nice aliases
+COPY --chown=$NB_UID:$NB_GID .bash_aliases /home/$NB_USER/
+
+USER $NB_UID
 LABEL maintainer="Pekka Ahtonen <pekka.ahtonen@dainstudios.com>"
 
 # Copy Captum wheel
