@@ -4,7 +4,7 @@
 # Ubuntu 18.04 and CUDA 10.2
 # https://hub.docker.com/r/nvidia/cuda
 # OS/ARCH: linux/amd64
-ARG ROOT_CONTAINER=nvidia/cuda:10.2-base-ubuntu18.04@sha256:4918ce9269396c77da6b45ee97e227fb56f37093c498a2a0bbebfda785a3b69e
+ARG ROOT_CONTAINER=nvidia/cuda:10.2-base-ubuntu18.04@sha256:218afa9c2002be9c4629406c07ae4daaf72a3d65eb3c5a5614d9d7110840a46e
 
 ARG BASE_CONTAINER=$ROOT_CONTAINER
 FROM $BASE_CONTAINER
