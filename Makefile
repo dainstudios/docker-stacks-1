@@ -23,6 +23,11 @@ ALL_STACKS:=base-notebook \
 endif
 
 ALL_IMAGES:=$(ALL_STACKS)
+XAI_IMAGES:=base-notebook \
+	minimal-notebook \
+	scipy-notebook \
+	pytorch-notebook \
+	xai-notebook
 
 # Linter
 HADOLINT="${HOME}/hadolint"
@@ -54,6 +59,8 @@ build/%: ## build the latest image for a stack
 
 build-all: $(foreach I,$(ALL_IMAGES),arch_patch/$(I) build/$(I) ) ## build all stacks
 build-test-all: $(foreach I,$(ALL_IMAGES),arch_patch/$(I) build/$(I) test/$(I) ) ## build and test all stacks
+
+build-xai: $(foreach I,$(XAI_IMAGES), build/$(I) ) ## build stacks up to xai-notebook
 
 
 check-outdated/%: ## check the outdated conda packages in a stack and produce a report (experimental)
