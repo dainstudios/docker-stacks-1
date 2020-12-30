@@ -11,7 +11,7 @@ USER $NB_UID
 # not available in conda-forge, to prevent a frozen dependency resolve
 #
 # Install following packages:
-#  Pytorch 1.6 with CUDA 10.2 support
+#  Pytorch with CUDA 10.2 support
 #  Torchvision
 #  Ignite
 #  Intel MKL backend, replaces OpenBLAS
@@ -23,8 +23,8 @@ RUN conda config --show channels && \
     conda config --system --set channel_priority flexible && \
     conda install -q -y \
     'conda-forge::blas=*=mkl' \
-    'pytorch=1.6*' \
-    'torchvision=0.7*' \
+    'pytorch=1.7*' \
+    'torchvision=0.8*' \
     'ignite=0.4*' \
     'cudatoolkit=10.2*' \
     && \
