@@ -66,7 +66,8 @@ RUN conda config --system --set channel_priority flexible && \
     'pillow' \
     'black' \
     'pylint' \
-    'flask' && \
+    'flask' \
+    'flask-compress' && \
     conda config --system --set channel_priority strict && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
