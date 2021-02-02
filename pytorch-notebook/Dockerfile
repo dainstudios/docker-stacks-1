@@ -23,7 +23,7 @@ RUN conda config --show channels && \
     conda config --system --set channel_priority flexible && \
     conda install -q -y \
     'conda-forge::blas=*=mkl' \
-    'pytorch=1.7*' \
+    'pytorch::pytorch=1.7*' \
     'torchvision=0.8*' \
     'ignite=0.4*' \
     'cudatoolkit=10.2*' \
