@@ -66,9 +66,11 @@ RUN conda config --system --set channel_priority flexible && \
     'pillow' \
     'black' \
     'pylint' \
+    'python-dotenv' \
     'isort' \
     'faiss' \
     'flask' \
+    'flask_cors' \
     'flask-compress' \
     'botocore' \
     'boto3' && \
