@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-ARG BASE_CONTAINER=jupyter/scipy-notebook
+ARG OWNER=jupyter
+ARG BASE_CONTAINER=$OWNER/scipy-notebook
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
@@ -13,46 +14,52 @@ USER root
 # Spark dependencies
 # Default values can be overridden at build time
 # (ARGS are in lower case to distinguish them from ENV)
-ARG spark_version="3.0.0"
+ARG spark_version="3.1.2"
 ARG hadoop_version="3.2"
-ARG spark_checksum="BFE45406C67CC4AE00411AD18CC438F51E7D4B6F14EB61E7BF6B5450897C2E8D3AB020152657C0239F253735C263512FFABF538AC5B9FFFA38B8295736A9C387"
-ARG py4j_version="0.10.9"
+ARG spark_checksum="2385CB772F21B014CE2ABD6B8F5E815721580D6E8BC42A26D70BBCDDA8D303D886A6F12B36D40F6971B5547B70FAE62B5A96146F0421CB93D4E51491308EF5D5"
 ARG openjdk_version="11"
 
 ENV APACHE_SPARK_VERSION="${spark_version}" \
     HADOOP_VERSION="${hadoop_version}"
 
-RUN apt-get -y update && \
-    apt-get install --no-install-recommends -y \
+RUN apt-get update --yes && \
+    apt-get install --yes --no-install-recommends \
     "openjdk-${openjdk_version}-jre-headless" \
     ca-certificates-java && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Spark installation
 WORKDIR /tmp
-# Using the preferred mirror to download Spark
-# hadolint ignore=SC2046
-RUN wget -q $(wget -qO- https://www.apache.org/dyn/closer.lua/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz\?as_json | \
-    python -c "import sys, json; content=json.load(sys.stdin); print(content['preferred']+content['path_info'])") && \
+RUN wget -q "https://archive.apache.org/dist/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" && \
     echo "${spark_checksum} *spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" | sha512sum -c - && \
     tar xzf "spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" -C /usr/local --owner root --group root --no-same-owner && \
     rm "spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz"
 
 WORKDIR /usr/local
-RUN ln -s "spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}" spark
 
 # Configure Spark
 ENV SPARK_HOME=/usr/local/spark
-ENV PYTHONPATH="${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-${py4j_version}-src.zip" \
-    SPARK_OPTS="--driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info" \
-    PATH=$PATH:$SPARK_HOME/bin
+ENV SPARK_OPTS="--driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info" \
+    PATH="${PATH}:${SPARK_HOME}/bin"
 
-USER $NB_UID
+RUN ln -s "spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}" spark && \
+    # Add a link in the before_notebook hook in order to source automatically PYTHONPATH
+    mkdir -p /usr/local/bin/before-notebook.d && \
+    ln -s "${SPARK_HOME}/sbin/spark-config.sh" /usr/local/bin/before-notebook.d/spark-config.sh
+
+# Fix Spark installation for Java 11 and Apache Arrow library
+# see: https://github.com/apache/spark/pull/27356, https://spark.apache.org/docs/latest/#downloading
+RUN cp -p "${SPARK_HOME}/conf/spark-defaults.conf.template" "${SPARK_HOME}/conf/spark-defaults.conf" && \
+    echo 'spark.driver.extraJavaOptions -Dio.netty.tryReflectionSetAccessible=true' >> "${SPARK_HOME}/conf/spark-defaults.conf" && \
+    echo 'spark.executor.extraJavaOptions -Dio.netty.tryReflectionSetAccessible=true' >> "${SPARK_HOME}/conf/spark-defaults.conf"
+
+USER ${NB_UID}
 
 # Install pyarrow
-RUN conda install --quiet -y 'pyarrow' && \
-    conda clean --all -f -y && \
+RUN mamba install --quiet --yes \
+    'pyarrow' && \
+    mamba clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
-WORKDIR $HOME
+WORKDIR "${HOME}"
