@@ -1,6 +1,7 @@
-# Copyright (c) DAIN Studios.
+# Copyright (c) DAIN Studios Development Team.
 # Distributed under the terms of the Modified BSD License.
-ARG BASE_CONTAINER=dain/scipy-notebook
+ARG OWNER=jupyter
+ARG BASE_CONTAINER=$OWNER/scipy-notebook
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Pekka Ahtonen <pekka.ahtonen@dainstudios.com>"
