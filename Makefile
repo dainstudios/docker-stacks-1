@@ -50,7 +50,7 @@ help:
 
 build/%: ## build the latest image for a stack using the system's architecture
 	@echo "::group::Build $(OWNER)/$(notdir $@) (system's architecture)"
-	docker build --rm --force-rm -t $(OWNER)/$(notdir $@):latest ./$(notdir $@) --build-arg OWNER=$(OWNER)
+	docker build --rm --force-rm -t $(OWNER)/$(notdir $@):latest ./$(notdir $@) --build-arg OWNER=$(OWNER) --build-arg PYTHON_VERSION=$(PYTHON_VERSION)
 	@echo -n "Built image size: "
 	@docker images $(OWNER)/$(notdir $@):latest --format "{{.Size}}"
 	@echo "::endgroup::"
