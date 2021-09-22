@@ -56,6 +56,14 @@ build/%: ## build the latest image for a stack using the system's architecture
 	@echo "::endgroup::"
 build-all: $(foreach I, $(ALL_IMAGES), build/$(I)) ## build all stacks
 
+MONAI_IMAGES:= \
+	base-notebook \
+	minimal-notebook \
+	r-notebook \
+	scipy-notebook \
+	pytorch-notebook
+build-monai: $(foreach I, $(MONAI_IMAGES), build/$(I))
+
 # Limitations on docker buildx build (using docker/buildx 0.5.1):
 #
 # 1. Can't --load and --push at the same time

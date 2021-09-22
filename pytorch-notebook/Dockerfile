@@ -8,18 +8,13 @@ LABEL maintainer="Pekka Ahtonen <pekka.ahtonen@dainstudios.com>"
 
 USER $NB_UID
 
-# Note that channel priority must be set flexible since cudatoolkit package is
-# not available in conda-forge, to prevent a frozen dependency resolve
-RUN conda install -q -y \
+RUN conda install -q -y -c conda-forge 'blas=*=mkl' 'cudatoolkit=10.2*' && \
+    conda install -q -y -c pytorch \
     'pytorch' \
     'torchvision' \
-    'torchaudio' \
-    'cudatoolkit=10.2 -c pytorch'\
-    && \    
+    'torchaudio' && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
-
-RUN pip install monai
 
 WORKDIR $HOME
