@@ -80,7 +80,7 @@ jobs:
 
       - name: Push Wiki to GitHub
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.event_name == 'schedule'
-        uses: stefanzweifel/git-auto-commit-action@abd87b7d94702070bef78dc1d56b6928b8fa9ecc # dependabot updates to latest release
+        uses: stefanzweifel/git-auto-commit-action@6c32682a4040e023c054b2fc60a7cf65cc77f7ad # dependabot updates to latest release
         with:
           commit_message: "[ci skip] Automated publish for ${{github.sha}}"
           repository: wiki/
